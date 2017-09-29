@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# ASSUMING THE IMAGE IS LAUNCHED VIA
+# docker run --rm -it -v /:/os dockhero-swarmkit-farm sh
+exec chroot /os /usr/bin/docker $@

@@ -4,19 +4,19 @@ const cli = require('cli');
 const promisifiedDeepstream = require('./utils/promisified-deepstream')
 const COMMON_ERRORS = require('./utils/common-errors')
 
-cli.parse(null, ['agent', 'bootstrap', 'ls']);
+// TODO: introduce command "Configure Logentries"
+cli.parse(null, ['agent', 'bootstrap']);
 const command = require(`./commands/${cli.command}`)
 
 async function start(deepstreamUrl) {
   const { login, getReadyRecord, getReadyList, makeRpc, provideRpc, closeDeepstream } = promisifiedDeepstream(deepstreamUrl)
 
   // DB schema
-  const getSwarmStateRecord = () => getReadyRecord("swarm-state")
-  const getSwarmNodesList = () => getReadyList("swarm-nodes")
+  const getSwarmStateRecord = () => getReadyRecord("queen")
 
   try {
     await login()
-    await command({cli, getSwarmStateRecord, getSwarmNodesList, makeRpc, provideRpc})
+    await command({cli, getSwarmStateRecord, makeRpc, provideRpc})
   }
   catch(error) {
     cli.fatal(`${COMMON_ERRORS[error.toString()] || "Something Went Wrong"}\nERROR_CODE: ${error}. See README for troubleshooting`)
