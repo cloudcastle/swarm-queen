@@ -1,7 +1,16 @@
-const {promisify} = require('util');
+const { promisify } = require('util');
+const { existsSync } = require('fs')
 const docker = require('docker-remote-api')
+
+const socket = existsSync('/var/run/docker.sock') && '/var/run/docker.sock' ||
+               existsSync('/os/var/run/docker.sock') && '/os/var/run/docker.sock'
+
+if (!socket) {
+  throw("No docker socket found. Please mount host FS under /os directory within container")
+}
+
 const request = docker({
-  host: '/var/run/docker.sock'
+  host: socket
 })
 
 const get = promisify(request.get).bind(request)
