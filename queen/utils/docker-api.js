@@ -15,16 +15,12 @@ const request = docker({
 
 const get = promisify(request.get).bind(request)
 
-async function getSwarmInfo() {
+function getSwarmInfo() {
   return get('/swarm', {json:true})
 }
 
-async function getSwarmNodes() {
+function getSwarmNodes() {
   return get('/nodes', {json:true})
-}
-
-async function run() {
-  console.log(await getNodes())
 }
 
 function getOwnSwarmStatus() {

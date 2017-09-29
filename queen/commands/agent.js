@@ -40,7 +40,7 @@ module.exports = async function({cli, provideRpc, getSwarmStateRecord}) {
  /************ utils *************/
  async function safe(getterFn) {
    try {
-     return getterFn()
+     return await getterFn()
    }
    catch(error) {
      return {Error: error.message}
