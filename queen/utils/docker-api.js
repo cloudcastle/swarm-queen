@@ -23,21 +23,8 @@ function getSwarmNodes() {
   return get('/nodes', {json:true})
 }
 
-function getOwnSwarmStatus() {
-  // return new Promise((resolve, reject) => {
-  //   request.get('/nodes', {json:true}, function(err, images) {
-  //     if (err) {
-  //       if (error.message.match(/not a swarm manager/)) {
-  //         resolve({isSwarmManager: false})
-  //       } else {
-  //         reject(err)
-  //       }
-  //     } else {
-  //       resolve({isSwarmManager: true})
-  //     }
-  //   })
-  // })
+function getNodeInfo() {
+  return get('/info', {json:true})
 }
 
-
-module.exports = { getSwarmInfo, getSwarmNodes, getOwnSwarmStatus}
+module.exports = { getSwarmInfo, getSwarmNodes, getNodeInfo }

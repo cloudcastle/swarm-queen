@@ -1,14 +1,14 @@
-const { BOOTSTRAP_SWARM_RPC, JOIN_MANAGER_CMD_FIELD } = require('../utils/schema')
+const { BOOTSTRAP_SWARM_RPC, JOIN_ADDR_FIELD } = require('../utils/schema')
 
-module.exports = async function({cli, makeRpc, getSwarmStateRecord}) {
+module.exports = async function({logger, makeRpc, getSwarmStateRecord}) {
   const record = await getSwarmStateRecord()
 
-  if (record.get("JOIN_MANAGER_CMD_FIELD")) {
+  if (record.get("JOIN_ADDR_FIELD")) {
     // TODO: detect broken swarms
-    cli.fatal("SWARM already initialized - try `node ls` command to talk to Swarm, or --force to re-initialize Swarm")
+    logger.fatal("SWARM already initialized - try `node ls` command to talk to Swarm, or --force to re-initialize Swarm")
   }
 
-  const result = await makeRpc(BOOTSTRAP_SWARM_RPC)
+  const result = await makeRpc(BOOTSTRAP_SWARM_RPC, {force: true})
 
-  cli.info(`Bootstrap finished: ${result}`)
+  logger.info(`Bootstrap finished: ${result}`)
 }

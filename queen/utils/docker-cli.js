@@ -1,17 +1,9 @@
-const docker = require('docker-remote-api')
-const request = docker({
-  host: '/var/run/docker.sock'
-})
+const {promisify} = require('util')
+const { execFile } = require('child_process')
+const execDocker = args => promisify(execFile)("docker", args)
 
 module.exports = {
-  dockerInfo,
-  dockerSwarmInit: async () => { console.log("SWARM initialized") },
-  getJoinManagerCmd: async () => "docker swarm join ......",
-  // getJoinWorkerCmd: async () => "docker swarm join ......"
-}
-
-function dockerInfo() {
-  return new Promise(resolve => {
-
-  })
+  dockerSwarmInit: () => execDocker(["swarm", "init", "--advertise-addr", "eth0"]),
+  dockerSwarmJoin: (joinToken, joinAddr) => execDocker(["swarm", "join", "--token", joinToken, joinAddr]),
+  dockerCmd: ({command, args}) => execDocker([command, ...args])
 }

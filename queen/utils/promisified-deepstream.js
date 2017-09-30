@@ -1,6 +1,6 @@
 const deepstream = require('deepstream.io-client-js')
 
-module.exports = function promisifiedDeepstream(url) {
+module.exports = function promisifiedDeepstream(url, logger = console) {
   const ds = deepstream(url)
 
   return {
@@ -9,12 +9,11 @@ module.exports = function promisifiedDeepstream(url) {
         ds.login(creds, (success, data) => {
           if (success) {
             ds.on( 'error', error => {
-              console.log(`ERROR: deepstream said: ${error}`)
+              logger.error(`ERROR: deepstream said: ${error}`)
             })
-
             resolve(ds);
           } else {
-            console.log(data)
+            logger.error(data)
             reject(`DeepStream Login failed: ${data.reason}`)
           }
         })
@@ -29,6 +28,9 @@ module.exports = function promisifiedDeepstream(url) {
 
     provideRpc: (name, cb) => ds.rpc.provide(name, cb),
     makeRpc: (name, data) => new Promise((r, f) => ds.rpc.make(name, data, (error, result) => error ? f(error) : r(result))),
+
+    subscribe: ds.event.subscribe.bind(ds.event),
+    emit: ds.event.emit.bind(ds.event),
 
     closeDeepstream: () => ds.close()
   }
