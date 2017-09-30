@@ -9,6 +9,11 @@ cli.parse(null, ['agent', 'bootstrap', 'dump', 'listen', 'wait', 'clean', 'node'
 const commandHandler = require(`./commands/${cli.command}`)
 const isAgent = cli.command === "agent"
 
+function remainingArgs() {
+  const [a, b, c, ...args] = process.argv
+  return args
+}
+
 // TODO: better cli-logger which forwards messages to client-side via Deepstream
 async function start(deepstreamUrl) {
   const { login, getReadyRecord, getReadyList, makeRpc, provideRpc, emit, subscribe, closeDeepstream } = promisifiedDeepstream(deepstreamUrl, cli)
@@ -31,7 +36,7 @@ async function start(deepstreamUrl) {
 
   try {
     await login()
-    await commandHandler({logger, getSwarmStateRecord, makeRpc, provideRpc, subscribe, remoteNodeReady, command: cli.command, args: cli.args})
+    await commandHandler({logger, getSwarmStateRecord, makeRpc, provideRpc, subscribe, remoteNodeReady, command: cli.command, args: remainingArgs()})
   }
   catch(error) {
     logger.fatal(`${COMMON_ERRORS[error.toString()] || "Something Went Wrong"}\nERROR_CODE: ${error}. See README for troubleshooting`)
