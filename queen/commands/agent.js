@@ -29,7 +29,7 @@ module.exports = async function({logger, provideRpc, getSwarmStateRecord}) {
   }
 
   async function handleBootstrapSwarmRpc(data, response)  {
-    if (swarmIsInitialized(swarmRecord) && !data.force) {
+    if (swarmIsInitialized(swarmRecord) && !(data || {}).force) {
       response.error("SWARM already initialized - bootstrap failed")
     } else {
       logger.info("Swarm Queen: bootstrapping a new swarm... ")

@@ -8,7 +8,7 @@ module.exports = async function({logger, makeRpc, getSwarmStateRecord}) {
     logger.fatal("SWARM already initialized - try `node ls` command to talk to Swarm, or --force to re-initialize Swarm")
   }
 
-  const result = await makeRpc(BOOTSTRAP_SWARM_RPC, {force: true})
+  const result = await makeRpc(BOOTSTRAP_SWARM_RPC, {}) // {force: true})
 
   logger.info(`Bootstrap finished: ${result}`)
 }
