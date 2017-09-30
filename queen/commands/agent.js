@@ -1,12 +1,12 @@
 const os = require('os')
-const { BOOTSTRAP_SWARM_RPC, JOIN_ADDR_FIELD, QUEEN_DOCKER_RPC } = require('../utils/schema')
+const { BOOTSTRAP_SWARM_RPC, JOIN_ADDR_FIELD, JOIN_TOKENS_FIELD, QUEEN_DOCKER_RPC } = require('../utils/schema')
 const { dockerSwarmInit, dockerSwarmJoin, dockerCmd } = require('../utils/docker-cli')
 const { getSwarmInfo, getSwarmNodes, getNodeInfo } = require('../utils/docker-api')
 
 const swarmIsInitialized = record => !!record.get(JOIN_ADDR_FIELD)
 
 module.exports = async function({logger, provideRpc, getSwarmStateRecord}) {
-  const swarmRecord = await getSwarmStateRecord()
+  let swarmRecord = await getSwarmStateRecord()
 
   // when the current node becomes a Manager, it should report Swarm state into Deepstream
   setInterval(doPeriodicActions, 10000)
@@ -46,13 +46,18 @@ module.exports = async function({logger, provideRpc, getSwarmStateRecord}) {
   }
 
   async function doPeriodicActions() {
+    if (swarmRecord.isDestroyed) {
+      logger.info("Swarm record was destroyed on the server. Creating a new one")
+      swarmRecord = await getSwarmStateRecord()
+    }
+
     const self = await getNodeInfo()
     const inSwarm = () => !!self.Swarm.NodeID
 
     if (inSwarm()) {
       await putLeaderInfoInDeepstreamIfLeader(self)
     } else {
-      swarmIsInitialized(swarmRecord) ? joinExistingSwarm(self) : logger.info("Waiting for a Swarm to join...")
+      swarmIsInitialized(swarmRecord) ? joinExistingSwarm(self) : logger.info("Waiting for bootstrap or a Swarm to join...")
     }
   }
 
@@ -71,13 +76,22 @@ module.exports = async function({logger, provideRpc, getSwarmStateRecord}) {
     }
   }
 
+  function deepEq(a, b) {
+    return JSON.stringify(a) === JSON.stringify(b)
+  }
+
   async function putLeaderInfoInDeepstreamIfLeader(self) {
     const nodes = await safe(getSwarmNodes)
     if (self.Swarm.NodeID === leaderId(nodes)) {
-      swarmRecord.set({
-        joinTokens: (await safe(getSwarmInfo)).JoinTokens,
-        [JOIN_ADDR_FIELD]: `${self.Swarm.NodeAddr}:2377`,
-      })
+      const joinAddr = `${self.Swarm.NodeAddr}:2377`
+      const joinTokens = (await safe(getSwarmInfo)).JoinTokens
+      if (swarmRecord.get(JOIN_ADDR_FIELD) !== joinAddr || !deepEq(swarmRecord.get(JOIN_TOKENS_FIELD), joinTokens)) {
+        logger.info(`Registering leader in Deepstream: ${joinAddr}`)
+        swarmRecord.set({
+          [JOIN_ADDR_FIELD]: joinAddr,
+          [JOIN_TOKENS_FIELD]: joinTokens
+        })
+      }
     }
   }
 

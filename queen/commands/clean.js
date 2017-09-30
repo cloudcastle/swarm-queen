@@ -6,12 +6,15 @@ module.exports = async function({logger, getSwarmStateRecord}) {
   const record = await getSwarmStateRecord()
 
   if (record.get(JOIN_ADDR_FIELD)) {
-    return docker({command: "node", args: ["ls"]}).then(() => {
-      logger.error("It looks like it's a live swarm... I don't want to kill it!")
-    }).catch(() => {
-      return record.delete()
-    })
-  } else {
-    return record.delete()
+    try {
+      await docker({command: "node", args: ["ls"]})
+      logger.error("It looks like it's a live swarm... I don't want to kill it! Aborting.")
+      return
+    }
+    catch(error) {
+      logger.info("OK, the SWARM is configured, but seems to be down. Removing the record")
+    }
   }
+
+  record.delete()
 }
