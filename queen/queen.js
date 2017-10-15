@@ -5,7 +5,7 @@ const promisifiedDeepstream = require('./utils/promisified-deepstream')
 const COMMON_ERRORS = require('./utils/common-errors')
 
 // TODO: introduce command "Configure Logentries"
-cli.parse(null, ['agent', 'bootstrap', 'dump', 'listen', 'wait', 'clean', 'node', 'service', 'secret']);
+cli.parse(null, ['agent', 'bootstrap', 'listen', 'wait', 'ping', 'node', 'service', 'secret']);
 const commandHandler = require(`./commands/${cli.command}`)
 const isAgent = cli.command === "agent"
 
@@ -31,12 +31,12 @@ async function start(deepstreamUrl) {
     })
   }
 
-  // DB schema
-  const getSwarmStateRecord = () => getReadyRecord("queen")
+  // TODO
+  // const dockerRepositoryCredentials = () => getReadyRecord("swarm_queen_repository_credentials_record")
 
   try {
     await login()
-    await commandHandler({logger, getSwarmStateRecord, makeRpc, provideRpc, subscribe, remoteNodeReady, command: cli.command, args: remainingArgs()})
+    await commandHandler({logger, makeRpc, provideRpc, subscribe, emit, remoteNodeReady, command: cli.command, args: remainingArgs()})
   }
   catch(error) {
     logger.fatal(`${COMMON_ERRORS[error.toString()] || "Something Went Wrong"}\nERROR_CODE: ${error}. See README for troubleshooting`)
