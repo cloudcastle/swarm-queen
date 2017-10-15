@@ -34,10 +34,3 @@ swarm-queen.sh node ls    # to make sure all nodes joined the swarm
 swarm-queen.sh service create ..... # to run something in the swarm
 ```
 
-4. Cleanup
-
-If you don't need your Swarm anymore and destroyed the terraform stack, make sure to also clean Deepstream:
-
-```
-swarm-queen.sh clean   
-```
