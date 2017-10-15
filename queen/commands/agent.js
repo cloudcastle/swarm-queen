@@ -6,7 +6,7 @@ const { getSwarmInfo, getNodeInfo } = require('../utils/docker-api')
 const SWARM_PORT = 2377 // TODO: can it change?
 
 module.exports = async function({logger, provideRpc, makeRpc, subscribe}) {
-  // subscribe(PING_EVENT, handlePing)
+  subscribe(PING_EVENT, handlePing)
 
   // these RPC handlers will reject if not applicable to the current state
   provideRpcIf(inSwarm, GET_JOIN_ADDR_RPC, handleGetJoinAddr)
@@ -48,8 +48,9 @@ module.exports = async function({logger, provideRpc, makeRpc, subscribe}) {
     logger.info("PING_EVENT received") // this log will be visible on the client side too
   }
 
-  async function handleGetJoinAddr({command, args}, response) {
-    response.send(await getJoinAddressAndTokens())
+  async function handleGetJoinAddr(_, response) {
+    const joinInfo = await getJoinAddressAndTokens()
+    response.send(joinInfo)
   }
 
   function handleDockerRpc({command, args}, response) {
@@ -76,10 +77,10 @@ module.exports = async function({logger, provideRpc, makeRpc, subscribe}) {
       if (await predicate()) {
         response.ack()
         try {
-          handler(data, response)
+          await handler(data, response)
         }
         catch(error) {
-          logger.error(error.message)
+          logger.error(`${error.message}\n${error.stack}`)
           response.error(error.message)
         }
       } else {
@@ -105,6 +106,7 @@ module.exports = async function({logger, provideRpc, makeRpc, subscribe}) {
   }
 
   async function getJoinAddressAndTokens() {
+    const self = await getNodeInfo()
     const joinAddr = `${self.Swarm.NodeAddr}:${SWARM_PORT}`
     const joinTokens = (await getSwarmInfo()).JoinTokens
     return {joinAddr, joinTokens}

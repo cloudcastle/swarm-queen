@@ -5,7 +5,7 @@ const promisifiedDeepstream = require('./utils/promisified-deepstream')
 const COMMON_ERRORS = require('./utils/common-errors')
 
 // TODO: introduce command "Configure Logentries"
-cli.parse(null, ['agent', 'bootstrap', 'listen', 'wait', 'ping', 'node', 'service', 'secret']);
+cli.parse(null, ['agent', 'bootstrap', 'listen', 'wait', 'ping', 'node', 'service', 'secret', 'getaddr']);
 const commandHandler = require(`./commands/${cli.command}`)
 const isAgent = cli.command === "agent"
 
