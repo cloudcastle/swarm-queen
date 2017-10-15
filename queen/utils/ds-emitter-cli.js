@@ -1,6 +1,6 @@
 const os = require("os")
 
-module.exports = function({info, warn, error}, emit) {
+module.exports = function({info, warn, error, fatal}, emit) {
   const hostname = os.hostname()
   const wrap = (fn, severity) => (...args) => {
     emit(`queen-log`, `[${hostname} ${severity}] ${args.join(' ')}`)
@@ -9,6 +9,7 @@ module.exports = function({info, warn, error}, emit) {
   return {
     info: wrap(info, "INFO"),
     warn: wrap(warn, "WARN"),
-    error: wrap(error, "ERROR")
+    error: wrap(error, "ERROR"),
+    fatal: wrap(fatal, "FATAL")
   }
 }

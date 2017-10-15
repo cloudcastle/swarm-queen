@@ -19,12 +19,13 @@ function getSwarmInfo() {
   return get('/swarm', {json:true})
 }
 
-function getSwarmNodes() {
-  return get('/nodes', {json:true})
-}
-
 function getNodeInfo() {
   return get('/info', {json:true})
 }
 
-module.exports = { getSwarmInfo, getSwarmNodes, getNodeInfo }
+module.exports = { getSwarmInfo, getNodeInfo }
+
+// YAGNI
+// function getSwarmNodes() {
+//   return get('/nodes', {json:true})
+// }
