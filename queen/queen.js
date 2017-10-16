@@ -3,6 +3,7 @@
 const cli = require('cli');
 const promisifiedDeepstream = require('./utils/promisified-deepstream')
 const COMMON_ERRORS = require('./utils/common-errors')
+const { LOG_EVENT } = require('./utils/schema')
 
 // TODO: introduce command "Configure Logentries"
 cli.parse(null, ['agent', 'bootstrap', 'listen', 'wait', 'ping', 'node', 'service', 'secret', 'getaddr']);
@@ -24,7 +25,7 @@ async function start(deepstreamUrl) {
   let remoteNodeReady = new Promise(r => {})
   if (!isAgent) {
     remoteNodeReady = new Promise(resolve => {
-      subscribe("queen-log", message => {
+      subscribe(LOG_EVENT, message => {
         cli.info(message)
         resolve(message)
       })

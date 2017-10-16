@@ -5,8 +5,10 @@ const execDocker = args => promisify(execFile)("docker", args)
 
 module.exports = {
   dockerSwarmInit: () => execDocker(["swarm", "init", "--advertise-addr", "eth0"]),
+
   dockerSwarmJoin: (joinToken, joinAddr) => execDocker(["swarm", "join", "--token", joinToken, joinAddr]),
-  dockerCmd: ({command, args, stdin}) => {
+
+  dockerCmd: function({command, args, stdin}) {
     return new Promise((resolve, reject) => {
       const child = execFile("docker", [command, ...args], (error, stdout, stderr) => {
         if (error) {
@@ -17,7 +19,7 @@ module.exports = {
       })
 
       // handling https://github.com/cloudcastle/swarm-queen/issues/6
-      if (typeof(stdin) !== "null" && typeof(stdin) !== "undefined") {
+      if (typeof(stdin) !== "undefined" && stdin !== null) {
         child.stdin.write(stdin)
       }
 

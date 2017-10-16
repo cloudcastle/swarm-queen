@@ -58,6 +58,7 @@ module.exports = async function({logger, provideRpc, makeRpc, subscribe}) {
       response.send({stdout, stderr, hostname: os.hostname()})
     }
     logger.info(`RPC EXEC: docker ${command} ${args.join(' ')}`)
+
     dockerCmd({command, args, stdin}).then(handler).catch(handler)
   }
 

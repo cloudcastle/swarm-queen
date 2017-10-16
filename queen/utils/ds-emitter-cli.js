@@ -1,9 +1,10 @@
 const os = require("os")
+const { LOG_EVENT } = require('./schema')
 
 module.exports = function({info, warn, error, fatal}, emit) {
   const hostname = os.hostname()
   const wrap = (fn, severity) => (...args) => {
-    emit(`queen-log`, `[${hostname} ${severity}] ${args.join(' ')}`)
+    emit(LOG_EVENT, `[${hostname} ${severity}] ${args.join(' ')}`)
     fn(...args)
   }
   return {
