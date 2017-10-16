@@ -7,7 +7,6 @@
     "cli": "^1.0.1",
     "deepstream.io-client-js": "^2.2.1",
     "docker-remote-api": "^4.4.1",
-    "get-stdin": "^5.0.1",
-    "tmp": "^0.0.33"
+    "get-stdin": "^5.0.1"
   }
 }
