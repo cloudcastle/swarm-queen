@@ -31,7 +31,7 @@ swarm-queen.sh bootstrap    # makes docker swarm init in AWS
 
 swarm-queen.sh node ls    # to make sure all nodes joined the swarm
 
-echo "some-password" | swarm-queen.sh secret create SECRET_NAME ..... # to create a secret in the SWARM
+echo "some-password" | swarm-queen.sh secret create SECRET_NAME    # to create a secret in the SWARM
 
 swarm-queen.sh service create ..... # to run something in the swarm
 ```
